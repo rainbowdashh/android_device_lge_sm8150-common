@@ -2,4 +2,4 @@
 ro.opa.eligible_device=true
 
 # eBPF
-ro.bpf.kver_override=5.4.299
+ro.bpf.kver_override=5.10.239
