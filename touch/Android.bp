@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2020 The LineageOS Project
+// Copyright (C) 2020-2026 The LineageOS Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
 // limitations under the License.
 
 cc_binary {
-    name: "vendor.lineage.touch@1.0-service.lge_sm8150",
-    vintf_fragments: ["vendor.lineage.touch@1.0-service.lge_sm8150.xml"],
-    init_rc: ["vendor.lineage.touch@1.0-service.lge_sm8150.rc"],
-    defaults: ["hidl_defaults"],
+    name: "vendor.lineage.touch-service.lge_sm8150",
+    vintf_fragments: ["vendor.lineage.touch-service.lge_sm8150.xml"],
+    init_rc: ["vendor.lineage.touch-service.lge_sm8150.rc"],
     relative_install_path: "hw",
-    proprietary: true,
+    vendor: true,
     srcs: [
         "GloveMode.cpp",
         "TouchscreenGesture.cpp",
@@ -27,9 +26,9 @@ cc_binary {
     ],
     shared_libs: [
         "libbase",
-        "libbinder",
-        "libhidlbase",
+        "libbinder_ndk",
+        "liblog",
         "libutils",
-        "vendor.lineage.touch@1.0",
+        "vendor.lineage.touch-V1-ndk",
     ],
 }

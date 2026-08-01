@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The LineageOS Project
+ * Copyright (C) 2020-2026 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,20 @@
 
 #pragma once
 
-#include <vendor/lineage/touch/1.0/IGloveMode.h>
+#include <aidl/vendor/lineage/touch/BnGloveMode.h>
 
+namespace aidl {
 namespace vendor {
 namespace lineage {
 namespace touch {
-namespace V1_0 {
-namespace implementation {
 
-using ::android::hardware::Return;
-
-class GloveMode : public IGloveMode {
+class GloveMode : public BnGloveMode {
   public:
-    // Methods from ::vendor::lineage::touch::V1_0::IGloveMode follow.
-    Return<bool> isEnabled() override;
-    Return<bool> setEnabled(bool enabled) override;
+    ndk::ScopedAStatus getEnabled(bool* _aidl_return) override;
+    ndk::ScopedAStatus setEnabled(bool enabled) override;
 };
 
-}  // namespace implementation
-}  // namespace V1_0
 }  // namespace touch
 }  // namespace lineage
 }  // namespace vendor
+}  // namespace aidl

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The LineageOS Project
+ * Copyright (C) 2020-2026 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,36 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "lineage.touch@1.0-service.lge_sm8150"
+#define LOG_TAG "vendor.lineage.touch-service.lge_sm8150"
 
 #include <android-base/logging.h>
-#include <hidl/HidlTransportSupport.h>
+#include <android/binder_manager.h>
+#include <android/binder_process.h>
 
 #include "GloveMode.h"
 #include "TouchscreenGesture.h"
 
-using ::vendor::lineage::touch::V1_0::IGloveMode;
-using ::vendor::lineage::touch::V1_0::ITouchscreenGesture;
-using ::vendor::lineage::touch::V1_0::implementation::GloveMode;
-using ::vendor::lineage::touch::V1_0::implementation::TouchscreenGesture;
+using aidl::vendor::lineage::touch::GloveMode;
+using aidl::vendor::lineage::touch::TouchscreenGesture;
 
 int main() {
-    android::sp<IGloveMode> gloveMode = new GloveMode();
-    android::sp<ITouchscreenGesture> touchscreenGesture = new TouchscreenGesture();
+    ABinderProcess_setThreadPoolMaxThreadCount(0);
 
-    android::hardware::configureRpcThreadpool(1, true /*callerWillJoin*/);
+    std::shared_ptr<GloveMode> gloveMode = ndk::SharedRefBase::make<GloveMode>();
+    std::shared_ptr<TouchscreenGesture> touchscreenGesture =
+            ndk::SharedRefBase::make<TouchscreenGesture>();
 
-    if (gloveMode->registerAsService() != android::OK) {
-        LOG(ERROR) << "Cannot register touchscreen glove HAL service.";
-        return 1;
-    }
+    const std::string gloveModeInstance = std::string(GloveMode::descriptor) + "/default";
+    binder_status_t status =
+            AServiceManager_addService(gloveMode->asBinder().get(), gloveModeInstance.c_str());
+    CHECK_EQ(status, STATUS_OK) << "Failed to add service " << gloveModeInstance << " " << status;
 
-    if (touchscreenGesture->registerAsService() != android::OK) {
-        LOG(ERROR) << "Cannot register touchscreen gesture HAL service.";
-        return 1;
-    }
+    const std::string gestureInstance =
+            std::string(TouchscreenGesture::descriptor) + "/default";
+    status = AServiceManager_addService(touchscreenGesture->asBinder().get(),
+                                        gestureInstance.c_str());
+    CHECK_EQ(status, STATUS_OK) << "Failed to add service " << gestureInstance << " " << status;
 
-    LOG(INFO) << "Touchscreen HAL service ready.";
-
-    android::hardware::joinRpcThreadpool();
-
-    LOG(ERROR) << "Touchscreen HAL service failed to join thread pool.";
-    return 1;
+    ABinderProcess_joinThreadPool();
+    return EXIT_FAILURE;  // should not reach
 }

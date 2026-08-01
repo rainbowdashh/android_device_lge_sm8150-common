@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The LineageOS Project
+ * Copyright (C) 2019-2026 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,10 @@
 
 #include "TouchscreenGesture.h"
 
+namespace aidl {
 namespace vendor {
 namespace lineage {
 namespace touch {
-namespace V1_0 {
-namespace implementation {
 
 const std::string kAvailableGesturePath = "/sys/devices/virtual/input/lge_touch/swipe_available"; 
 const std::string kGesturePath = "/sys/devices/virtual/input/lge_touch/swipe_enable"; 
@@ -68,37 +67,39 @@ TouchscreenGesture::TouchscreenGesture() {
     }
 }
 
-Return<void> TouchscreenGesture::getSupportedGestures(getSupportedGestures_cb resultCb) {
+ndk::ScopedAStatus TouchscreenGesture::getSupportedGestures(
+        std::vector<Gesture>* _aidl_return) {
     std::vector<Gesture> gestures;
 
     for (const auto& entry : kGestureInfoMap) {
         gestures.push_back({entry.first, entry.second.name, entry.second.keycode});
     }
-    resultCb(gestures);
-
-    return Void();
+    *_aidl_return = gestures;
+    return ndk::ScopedAStatus::ok();
 }
 
-Return<bool> TouchscreenGesture::setGestureEnabled(
-    const ::vendor::lineage::touch::V1_0::Gesture& gesture, bool enable) {
+ndk::ScopedAStatus TouchscreenGesture::setGestureEnabled(const Gesture& gesture, bool enabled) {
 
     std::ofstream file(kGesturePath);
     std::map<int32_t, GestureInfo>::iterator it;
     it = kGestureInfoMap.find(gesture.id);
     if(it == kGestureInfoMap.end()) {
-        return false;
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
     GestureInfo gi = it->second;
 
-    std::string output = std::to_string(gi.swipe_id) + " " + std::to_string(enable);
+    std::string output = std::to_string(gi.swipe_id) + " " + std::to_string(enabled);
 
     file << output;
 
-    return !file.fail();
+    if (file.fail()) {
+        return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+    }
+
+    return ndk::ScopedAStatus::ok();
 }
 
-}  // namespace implementation
-}  // namespace V1_0
 }  // namespace touch
 }  // namespace lineage
 }  // namespace vendor
+}  // namespace aidl

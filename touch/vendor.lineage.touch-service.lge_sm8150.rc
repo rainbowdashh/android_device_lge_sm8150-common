@@ -1,0 +1,10 @@
+on boot
+    chown system system /sys/devices/virtual/input/lge_touch/swipe_available
+    chmod 664 /sys/devices/virtual/input/lge_touch/swipe_available
+
+service vendor.touch-hal /vendor/bin/hw/vendor.lineage.touch-service.lge_sm8150
+    class hal
+    user system
+    group system
+    interface aidl vendor.lineage.touch.IGloveMode/default
+    interface aidl vendor.lineage.touch.ITouchscreenGesture/default

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The LineageOS Project
+ * Copyright (C) 2020-2026 The LineageOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,33 +20,33 @@
 
 #include <fstream>
 
+namespace aidl {
 namespace vendor {
 namespace lineage {
 namespace touch {
-namespace V1_0 {
-namespace implementation {
 
 const std::string kFilmStatusPath = "/sys/devices/virtual/input/lge_touch/film_status";
 
-Return<bool> GloveMode::isEnabled() {
+ndk::ScopedAStatus GloveMode::getEnabled(bool* _aidl_return) {
     std::ifstream file(kFilmStatusPath);
     int enabled;
     file >> enabled;
 
-    if(enabled == 1)
-        return true;
-
-    return false;
+    *_aidl_return = enabled == 1;
+    return ndk::ScopedAStatus::ok();
 }
 
-Return<bool> GloveMode::setEnabled(bool enabled) {
+ndk::ScopedAStatus GloveMode::setEnabled(bool enabled) {
     std::ofstream file(kFilmStatusPath);
     file << (enabled ? "1" : "0");
-    return !file.fail();
+    if (file.fail()) {
+        return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+    }
+
+    return ndk::ScopedAStatus::ok();
 }
 
-}  // namespace implementation
-}  // namespace V1_0
 }  // namespace touch
 }  // namespace lineage
 }  // namespace vendor
+}  // namespace aidl

@@ -427,7 +427,7 @@ PRODUCT_PACKAGES += \
 
 # Touch
 PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.lge_sm8150
+    vendor.lineage.touch-service.lge_sm8150
 
 # Update engine
 PRODUCT_HOST_PACKAGES += \
