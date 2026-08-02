@@ -37,6 +37,7 @@
         <interface>
             <name>ILgeRadio</name>
             <instance>lge_radio</instance>
+            <instance>lge_radio2</instance>
             <instance>radio1_wifi</instance>
             <instance>radio2_wifi</instance>
         </interface>
